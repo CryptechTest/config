@@ -11,6 +11,10 @@ While some might be opposed to using Lua for configuration purposes, arguing tha
 anti-pattern, that's not actually true. In fact, Lua itself was originally intended to
 double as a configuration language, like JSON, so it is very befitting of its purpose.
 
+   "Lua started off as a configuration language. This has some nice quirks in that it's 
+   great for creating and configuring things - which is what you want to do in a game."
+   from Lua Users Wiki: Lua versus Python (http://lua-users.org/wiki/LuaVersusPython)
+
    "An important use of Lua is as a configuration language...."
    from Programming in Lua: Extending your Application (https://www.lua.org/pil/25.html)
 
@@ -49,8 +53,10 @@ default, however, all three would remain false since the world configuration is 
 whenever the game configuration is found. 
 
 A chat command is also available for editing the configuration directly in-game. Simply
-type '/config' followed by the mod name to configure. The interface is self-explanatory.
+type '/config' followed by the mod name to configure (requires the "server" privilege).
 
+Special Note: In order to use the chat command you must add "conf" to the list of trusted 
+mods in minetest.conf, otherwise the editing functionality will be disabled.
 
 Repository
 ----------------------

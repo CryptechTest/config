@@ -7,6 +7,7 @@
 -- ./games/minetest_game/mods/config/init.lua
 --------------------------------------------------------
 
+local env = minetest.request_insecure_environment( )
 local world_path =  minetest.get_worldpath( )
 local configured_mods = { }
 
@@ -28,7 +29,7 @@ local function import( config, filename )
 end
 
 local function load_world_config( mod_name )
-	local file = io.open( world_path .. "/config/" .. mod_name .. ".lua", "r" )
+	local file = env.io.open( world_path .. "/config/" .. mod_name .. ".lua", "r" )
 	if not file then return nil end
 
 	local data = file:read( "*all" )
@@ -37,7 +38,7 @@ local function load_world_config( mod_name )
 end
 
 local function load_game_config( mod_name )
-	local file = io.open( minetest.get_modpath( mod_name ) .. "/config.lua", "r" )
+	local file = env.io.open( minetest.get_modpath( mod_name ) .. "/config.lua", "r" )
 	if not file then return nil end
 
 	local data = file:read( "*all" )
@@ -46,7 +47,7 @@ local function load_game_config( mod_name )
 end
 
 local function save_world_config( mod_name, data )
-        local file = io.open( world_path .. "/config/" .. mod_name .. ".lua", "w" )
+        local file = env.io.open( world_path .. "/config/" .. mod_name .. ".lua", "w" )
         if not file then return false end
 
         file:write( data )
@@ -55,7 +56,7 @@ local function save_world_config( mod_name, data )
 end
 
 local function save_game_config( mod_name, data )
-        local file = io.open( minetest.get_modpath( mod_name ) .. "/config.lua", "w" )
+        local file = env.io.open( minetest.get_modpath( mod_name ) .. "/config.lua", "w" )
         if not file then return false end
 
         file:write( data )
@@ -64,7 +65,7 @@ local function save_game_config( mod_name, data )
 end
 
 local function create_world_config( mod_name )
-	local file = io.open( world_path .. "/config/" .. mod_name .. ".lua", "w" )
+	local file = env.io.open( world_path .. "/config/" .. mod_name .. ".lua", "w" )
 	if not file then return false end
 
 	file:close( )
@@ -72,7 +73,7 @@ local function create_world_config( mod_name )
 end
 
 local function create_game_config( mod_name )
-	local file = io.open( minetest.get_modpath( mod_name ) .. "/config.lua", "w" )
+	local file = env.io.open( minetest.get_modpath( mod_name ) .. "/config.lua", "w" )
 	if not file  then return false end
 
 	file:close( )
@@ -80,11 +81,11 @@ local function create_game_config( mod_name )
 end
 
 local function delete_world_config( mod_name )
-	return os.remove( world_path .. "/config/" .. mod_name .. ".lua" ) ~= nil
+	return env.os.remove( world_path .. "/config/" .. mod_name .. ".lua" ) ~= nil
 end
 
 local function delete_game_config( mod_name )
-	return os.remove( minetest.get_modpath( mod_name ) .. "/config.lua" ) ~= nil
+	return env.os.remove( minetest.get_modpath( mod_name ) .. "/config.lua" ) ~= nil
 end
 
 local function open_config_editor( player_name, mod_name )
@@ -228,6 +229,8 @@ minetest.register_chatcommand( "config", {
 	description = "View and edit the configuration for a given mod.",
 	privs = { server = true },
 	func = function( player_name, param )
+		if not env then return false, "This command is disabled in a secure environment." end
+
 		if not string.match( param, "^[a-zA-Z0-9_]+$" ) then
 			return false, "Invalid mod name." 
 		elseif not configured_mods[ param ] then
@@ -235,5 +238,6 @@ minetest.register_chatcommand( "config", {
 		end
 
 		open_config_editor( player_name, param )
+		return true
 	end
 } )
