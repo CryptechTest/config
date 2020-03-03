@@ -55,7 +55,7 @@ whenever the game configuration is found.
 A chat command is also available for editing the configuration directly in-game. Simply
 type '/config' followed by the mod name to configure (requires the "server" privilege).
 
-Special Note: In order to use the chat command you must add "conf" to the list of trusted 
+Special Note: Before using the chat command you must add "config" to the list of trusted 
 mods in minetest.conf, otherwise the editing functionality will be disabled.
 
 Repository
