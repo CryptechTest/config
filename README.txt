@@ -1,4 +1,4 @@
-Configuration Panel Mod v1.0
+Configuration Panel Mod v1.1
 By Leslie Krause
 
 Configuration Panel is an API extension for Minetest that allows seamless loading of mod 
@@ -25,7 +25,13 @@ There is only one function call necessary to load your mod's configuration:
    and returns a table of key-value pairs.
 
     * 'base_config' is the default mod configuration (optional)
-    * 'options' are the additional options that effect loading behavior (optional)
+    * 'options' are additional options that effect loading behavior (optional)
+
+   Example:
+   > local config = minetest.load_config( {
+   >         spawn_pos = { x = 0, y = 0, z = 0 },
+   >         filename = "player_spawns.txt",
+   > } )
 
 By default, the configuration is first loaded from the 'config.lua' script within the mod
 directory. If not found, it will instead be loaded from a script residing within the 
@@ -38,25 +44,61 @@ This would be the typical order of loading on Linux distros of Minetest:
    /home/minetest/.minetest/worlds/sample_world/config/sample_mod.lua
 
 By specifying the option 'can_override = true', both scripts will be loaded, allowing for
-the world configuration to override the game configuration. So for example
+the world configuration to override the game configuration. If, for example, you want to
+change some game-specific settings for your mod, "sample_mod", as well as world-specific
+settings for the world, "my_world", then you would save scripts in two locations:
 
    /usr/local/share/minetest/games/minetest_game/mods/sample_mod/config.lua
+
    > allow_fly = false
    > allow_walk = false
    > allow_swim = false
 
-   /home/minetest/.minetest/worlds/sample_world/config/sample_mod.lua
+   /home/minetest/.minetest/worlds/my_world/config/sample_mod.lua
+
    > allow_swim = true
 
 Hence, 'allow_fly' and 'allow_walk' will be false, whereas 'allow_swim' will be true. By
 default, however, all three would remain false since the world configuration is ignored
 whenever the game configuration is found. 
 
+For security reasons, configuration scripts are executed within a restricted environment.
+However, the following builtin functions are made available for convenience:
+
+   * core.print
+   * core.debug (alias for minetest.log)
+   * core.is_yes (alias for minetest.is_yes)
+   * core.has_feature (alias for minetest.has_feature)
+   * core.string_to_pos (alias for minetest.string_to_pos)
+   * core.pos_to_string (alias for minetest.pos_to_string)
+   * core.colorize (alias for minetest.colorize)
+   * core.tonumber
+   * core.tostring
+   * core.sprintf (alias for string.format)
+   * core.tolower (alias for string.lower)
+   * core.toupper (alias for string.upper)
+   * core.concat (alias for table.concat)
+   * core.random (alias for math.random)
+   * core.max (alias for math.max)
+   * core.min (alias for math.min)
+   * core.next
+   * core.pairs
+   * core.ipairs
+   * core.date (alias for os.date)
+   * core.time (alias for os.time)
+   * core.assert
+   * core.error
+
+The 'core' table also contains the properties 'MOD_NAME', 'MOD_PATH', and 'WORLD_PATH'
+which designate the name and the path of the currently loading mod as well as the path 
+of the selected world respectively.
+
 A chat command is also available for editing the configuration directly in-game. Simply
 type '/config' followed by the mod name to configure (requires the "server" privilege).
 
 Special Note: Before using the chat command you must add "config" to the list of trusted 
-mods in minetest.conf, otherwise the editing functionality will be disabled.
+mods in minetest.conf and you must install the ActiveFormspecs mod, otherwise the editing 
+functionality will be disabled.
 
 Repository
 ----------------------
@@ -74,7 +116,7 @@ Dependencies
 Default Mod (required)
   https://github.com/minetest-game-mods/default
 
-ActiveFormspecs Mod v2.6 (required)
+ActiveFormspecs Mod (optional)
   https://bitbucket.org/sorcerykid/formspecs
 
 Installation

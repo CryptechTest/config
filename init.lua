@@ -21,7 +21,7 @@ local function import( config, filename )
 		setfenv( func, config )
 		local status = pcall( func )
 		if not status then
-			error( "Syntax error in configuration file: " .. filename )
+			error( "Error in configuration file: " .. filename )
 		end
 		return true
 	end
@@ -47,20 +47,20 @@ local function load_game_config( mod_name )
 end
 
 local function save_world_config( mod_name, data )
-        local file = env.io.open( world_path .. "/config/" .. mod_name .. ".lua", "w" )
-        if not file then return false end
+	local file = env.io.open( world_path .. "/config/" .. mod_name .. ".lua", "w" )
+	if not file then return false end
 
-        file:write( data )
-        file:close( )
+	file:write( data )
+	file:close( )
 	return true
 end
 
 local function save_game_config( mod_name, data )
-        local file = env.io.open( minetest.get_modpath( mod_name ) .. "/config.lua", "w" )
-        if not file then return false end
+	local file = env.io.open( minetest.get_modpath( mod_name ) .. "/config.lua", "w" )
+	if not file then return false end
 
-        file:write( data )
-        file:close( )
+	file:write( data )
+	file:close( )
 	return true
 end
 
@@ -186,7 +186,7 @@ end
 minetest.load_config = function ( base_config, options )
 	local name = minetest.get_current_modname( )
 	local path = minetest.get_modpath( name )
-	local config = { } or base_config
+	local config = base_config or { }
 	local status
 
 	if not options then options = { } end
@@ -195,9 +195,23 @@ minetest.load_config = function ( base_config, options )
 		MOD_NAME = name,
 		MOD_PATH = path,
 		WORLD_PATH = world_path,
+		tonumber = tonumber,
+		tostring = tostring,
 		sprintf = string.format,
+		tolower = string.lower,
+		toupper = string.upper,
+		concat = table.concat,
+		random = math.random,
+		max = math.max,
+		min = math.min,
+		print = print,
+		next = next,
+		pairs = pairs,
+		ipairs = ipairs,
 		date = os.date,
 		time = os.time,
+		assert = assert,
+		error = error,
 	}
 
 	if options.can_override then
@@ -229,7 +243,11 @@ minetest.register_chatcommand( "config", {
 	description = "View and edit the configuration for a given mod.",
 	privs = { server = true },
 	func = function( player_name, param )
-		if not env then return false, "This command is disabled in a secure environment." end
+		if not env then
+			return false, "This feature is disabled in a secure environment."
+		elseif not minetest.create_form then
+			return false, "This feature is not supported."
+		end
 
 		if not string.match( param, "^[a-zA-Z0-9_]+$" ) then
 			return false, "Invalid mod name." 
